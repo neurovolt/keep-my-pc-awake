@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keep My PC Awake</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      text-align: center;
+      padding-top: 10%;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    button {
+      background: #238636;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    button:hover {
+      background: #2ea043;
+    }
+    #status {
+      margin-top: 1rem;
+      font-size: 1.1rem;
+    }
+    .coffee {
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Keep My PC Awake</h1>
+  <button id="toggleButton">Keep Awake</button>
+  <div id="status">Status: Inactive</div>
+
+  <div class="coffee">
+    <a href="https://www.buymeacoffee.com/YOURUSERNAME" target="_blank">
+      <img
+        src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+        alt="Buy Me A Coffee"
+        height="50"
+        width="217"
+      />
+    </a>
+  </div>
+
+  <script>
+    let wakeLock = null;
+    const button = document.getElementById("toggleButton");
+    const statusText = document.getElementById("status");
+
+    async function requestWakeLock() {
+      try {
+        wakeLock = await navigator.wakeLock.request("screen");
+        statusText.textContent = "Status: Awake (active)";
+        button.textContent = "Stop Keeping Awake";
+
+        wakeLock.addEventListener("release", () => {
+          statusText.textContent = "Status: Inactive";
+          button.textContent = "Keep Awake";
+        });
+      } catch (err) {
+        statusText.textContent = "Wake Lock not supported or blocked by browser.";
+        console.error(err);
+      }
+    }
+
+    button.addEventListener("click", async () => {
+      if (wakeLock) {
+        wakeLock.release();
+        wakeLock = null;
+      } else {
+        await requestWakeLock();
+      }
+    });
+  </script>
+</body>
+</html>
