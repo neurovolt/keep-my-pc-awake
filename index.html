@@ -43,16 +43,20 @@ button {
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
-#toggleButton {
-  background: var(--button-dark);
-  color: white;
+#toggleButton { background: var(--button-dark); color: white; }
+body.light #toggleButton { background: var(--button-light); }
+
+input {
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #888;
+  width: 100px;
+  text-align: center;
+  transition: background 0.3s, color 0.3s, border 0.3s;
 }
 
-body.light #toggleButton {
-  background: var(--button-light);
-}
-
-button:hover { transform: scale(1.05); }
+body.dark input { background: #1c1c1c; color: var(--text-dark); border-color: #555; }
+body.light input { background: #fff; color: var(--text-light); border-color: #aaa; }
 
 #status { margin-top: 1rem; font-size: 1.1rem; }
 
@@ -69,35 +73,19 @@ button:hover { transform: scale(1.05); }
 
 #themeToggle.rotate { transform: rotate(360deg); }
 
-/* Digital clock with pulsing glow */
 .clock {
   font-size: 3rem;
   font-weight: bold;
   margin-top: 2rem;
-  color: var(--glow-color);
-  text-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color);
-  animation: pulse 1.5s infinite alternate;
+  color: inherit;
+  transition: text-shadow 0.3s;
 }
 
-@keyframes pulse {
-  from {
-    text-shadow: 0 0 5px var(--glow-color), 0 0 10px var(--glow-color);
-  }
-  to {
-    text-shadow: 0 0 20px var(--glow-color), 0 0 40px var(--glow-color);
-  }
-}
-
-input {
-  padding: 0.5rem;
-  border-radius: 6px;
-  border: 1px solid #888;
-  width: 100px;
-  text-align: center;
+.clock:hover {
+  text-shadow: 0 0 8px var(--glow-color), 0 0 16px var(--glow-color);
 }
 
 .timer { margin-top: 2rem; }
-
 .note { font-size: 0.9rem; opacity: 0.7; margin-top: 0.5rem; }
 </style>
 </head>
@@ -129,7 +117,7 @@ let startTime = null;
 let elapsedInterval = null;
 let autoStopTimeout = null;
 
-function pad(num) { return String(num).padStart(2, "0"); }
+function pad(num) { return String(num).padStart(2,"0"); }
 
 function startClock() {
   startTime = Date.now();
@@ -139,7 +127,7 @@ function startClock() {
     const mins = Math.floor((elapsed % 3600000) / 60000);
     const secs = Math.floor((elapsed % 60000) / 1000);
     clock.textContent = `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
-  }, 1000);
+  },1000);
 }
 
 function stopClock() {
@@ -156,7 +144,7 @@ async function requestWakeLock() {
 
     const minutes = parseInt(timerInput.value);
     if (!isNaN(minutes) && minutes > 0) {
-      autoStopTimeout = setTimeout(stopWakeLock, minutes * 60 * 1000);
+      autoStopTimeout = setTimeout(stopWakeLock, minutes*60*1000);
     }
 
     wakeLock.addEventListener("release", () => {
@@ -164,32 +152,32 @@ async function requestWakeLock() {
       statusText.textContent = "Status: Inactive";
       button.textContent = "Keep Awake";
     });
-  } catch (err) {
+  } catch(err) {
     statusText.textContent = "Wake Lock not supported or blocked by browser.";
     console.error(err);
   }
 }
 
 function stopWakeLock() {
-  if (wakeLock) { wakeLock.release(); wakeLock = null; }
+  if(wakeLock){ wakeLock.release(); wakeLock=null; }
   stopClock();
   clearTimeout(autoStopTimeout);
 }
 
 button.addEventListener("click", async () => {
-  if (wakeLock) stopWakeLock();
+  if(wakeLock) stopWakeLock();
   else await requestWakeLock();
 });
 
 themeToggle.addEventListener("click", () => {
   themeToggle.classList.add("rotate");
-  setTimeout(() => themeToggle.classList.remove("rotate"), 500);
-  if (body.classList.contains("dark")) {
-    body.classList.replace("dark", "light");
-    themeToggle.textContent = "☀️";
+  setTimeout(()=>themeToggle.classList.remove("rotate"),500);
+  if(body.classList.contains("dark")) {
+    body.classList.replace("dark","light");
+    themeToggle.textContent="☀️";
   } else {
-    body.classList.replace("light", "dark");
-    themeToggle.textContent = "🌙";
+    body.classList.replace("light","dark");
+    themeToggle.textContent="🌙";
   }
 });
 </script>
