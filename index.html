@@ -40,7 +40,7 @@ button {
   padding: 1rem 2rem;
   font-size: 1rem;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
 #toggleButton { background: var(--button-dark); color: white; }
@@ -73,16 +73,26 @@ body.light input { background: #fff; color: var(--text-light); border-color: #aa
 
 #themeToggle.rotate { transform: rotate(360deg); }
 
+/* Clock with hover pulse */
 .clock {
   font-size: 3rem;
   font-weight: bold;
   margin-top: 2rem;
   color: inherit;
-  transition: text-shadow 0.3s;
+  transition: text-shadow 0.3s ease-in-out;
 }
 
 .clock:hover {
-  text-shadow: 0 0 8px var(--glow-color), 0 0 16px var(--glow-color);
+  animation: glowPulse 1.5s infinite alternate;
+}
+
+@keyframes glowPulse {
+  from {
+    text-shadow: 0 0 4px var(--glow-color), 0 0 8px var(--glow-color);
+  }
+  to {
+    text-shadow: 0 0 10px var(--glow-color), 0 0 20px var(--glow-color);
+  }
 }
 
 .timer { margin-top: 2rem; }
