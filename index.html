@@ -1,304 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Keep My PC Awake</title>
-  <style>
-    :root {
-      --bg-dark: #0d1117;
-      --bg-light: #f5f5f5;
-      --text-dark: #e6edf3;
-      --text-light: #1c1c1c;
-      --button-dark: #238636;
-      --button-light: #0078d7;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flip Stopwatch</title>
+<style>
+body {
+  font-family: system-ui, sans-serif;
+  background: #0d1117;
+  color: #e6edf3;
+  text-align: center;
+  padding-top: 5%;
+}
 
-    body {
-      font-family: system-ui, sans-serif;
-      text-align: center;
-      padding-top: 5%;
-      transition: background 0.5s ease, color 0.5s ease;
-    }
+h1 { margin-bottom: 2rem; }
 
-    body.dark {
-      background: var(--bg-dark);
-      color: var(--text-dark);
-    }
+.flip-clock {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  font-size: 3rem;
+}
 
-    body.light {
-      background: var(--bg-light);
-      color: var(--text-light);
-    }
+.flip-digit {
+  width: 50px;
+  height: 70px;
+  perspective: 200px;
+  position: relative;
+}
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
+.top, .bottom, .flip-top, .flip-bottom {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  line-height: 35px;
+  text-align: center;
+  background: rgba(0,0,0,0.2);
+  border-radius: 6px;
+  overflow: hidden;
+}
 
-    button {
-      border: none;
-      border-radius: 8px;
-      padding: 1rem 2rem;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.2s ease, transform 0.2s ease;
-    }
+.top { top:0; border-bottom: 1px solid #555; }
+.bottom { bottom:0; border-top: 1px solid #555; }
 
-    #toggleButton {
-      background: var(--button-dark);
-      color: white;
-    }
+.flip-top, .flip-bottom {
+  backface-visibility: hidden;
+}
 
-    body.light #toggleButton {
-      background: var(--button-light);
-    }
+.flip-top {
+  top:0;
+  transform-origin: bottom;
+}
+.flip-bottom {
+  bottom:0;
+  transform-origin: top;
+}
 
-    button:hover {
-      transform: scale(1.05);
-    }
+.separator {
+  display: flex;
+  align-items: center;
+  font-size: 3rem;
+}
 
-    #status {
-      margin-top: 1rem;
-      font-size: 1.1rem;
-    }
-
-    #themeToggle {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 1.8rem;
-      transition: transform 0.5s ease;
-    }
-
-    #themeToggle.rotate {
-      transform: rotate(360deg);
-    }
-
-    /* Flip clock */
-    .flip-clock {
-      display: flex;
-      justify-content: center;
-      margin-top: 2rem;
-      gap: 5px;
-      font-size: 3rem;
-      font-weight: bold;
-    }
-
-    .flip-digit {
-      position: relative;
-      width: 50px;
-      height: 70px;
-      perspective: 200px;
-    }
-
-    .digit-top,
-    .digit-bottom,
-    .digit-flip {
-      position: absolute;
-      left: 0;
-      width: 100%;
-      height: 50%;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: rgba(0,0,0,0.2);
-      border-radius: 6px;
-      backface-visibility: hidden;
-    }
-
-    .digit-top {
-      top: 0;
-      border-bottom: 1px solid #555;
-    }
-
-    .digit-bottom {
-      bottom: 0;
-      border-top: 1px solid #555;
-    }
-
-    .digit-flip {
-      top: 0;
-      transform-origin: bottom;
-      transform: rotateX(0deg);
-      background: rgba(0,0,0,0.3);
-      border-bottom: 1px solid #555;
-    }
-
-    .separator {
-      display: flex;
-      align-items: center;
-      font-size: 3rem;
-    }
-
-    input {
-      padding: 0.5rem;
-      border-radius: 6px;
-      border: 1px solid #888;
-      width: 100px;
-      text-align: center;
-    }
-
-    .timer {
-      margin-top: 2rem;
-    }
-
-    .note {
-      font-size: 0.9rem;
-      opacity: 0.7;
-      margin-top: 0.5rem;
-    }
-  </style>
+button {
+  margin-top: 1rem;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  background: #238636;
+  color: white;
+}
+</style>
 </head>
-<body class="dark">
-  <button id="themeToggle" title="Toggle theme">🌙</button>
-  <h1>Keep My PC Awake</h1>
+<body>
+<h1>Flip Stopwatch</h1>
+<button id="toggle">Keep Awake</button>
+<div class="flip-clock" id="flipClock">
+  <div class="flip-digit" id="hT"><div class="top">0</div><div class="bottom">0</div></div>
+  <div class="flip-digit" id="hO"><div class="top">0</div><div class="bottom">0</div></div>
+  <div class="separator">:</div>
+  <div class="flip-digit" id="mT"><div class="top">0</div><div class="bottom">0</div></div>
+  <div class="flip-digit" id="mO"><div class="top">0</div><div class="bottom">0</div></div>
+  <div class="separator">:</div>
+  <div class="flip-digit" id="sT"><div class="top">0</div><div class="bottom">0</div></div>
+  <div class="flip-digit" id="sO"><div class="top">0</div><div class="bottom">0</div></div>
+</div>
 
-  <button id="toggleButton">Keep Awake</button>
-  <div id="status">Status: Inactive</div>
+<script>
+let running = false;
+let startTime = 0;
+let interval;
 
-  <div class="flip-clock" id="flipClock">
-    <div class="flip-digit" id="hourTens"><div class="digit-top">0</div><div class="digit-bottom">0</div><div class="digit-flip"></div></div>
-    <div class="flip-digit" id="hourOnes"><div class="digit-top">0</div><div class="digit-bottom">0</div><div class="digit-flip"></div></div>
-    <div class="separator">:</div>
-    <div class="flip-digit" id="minTens"><div class="digit-top">0</div><div class="digit-bottom">0</div><div class="digit-flip"></div></div>
-    <div class="flip-digit" id="minOnes"><div class="digit-top">0</div><div class="digit-bottom">0</div><div class="digit-flip"></div></div>
-    <div class="separator">:</div>
-    <div class="flip-digit" id="secTens"><div class="digit-top">0</div><div class="digit-bottom">0</div><div class="digit-flip"></div></div>
-    <div class="flip-digit" id="secOnes"><div class="digit-top">0</div><div class="digit-bottom">0</div><div class="digit-flip"></div></div>
-  </div>
+const digits = {
+  hT: document.getElementById("hT"),
+  hO: document.getElementById("hO"),
+  mT: document.getElementById("mT"),
+  mO: document.getElementById("mO"),
+  sT: document.getElementById("sT"),
+  sO: document.getElementById("sO")
+};
 
-  <div class="timer">
-    <p>Auto-stop after (minutes):</p>
-    <input type="number" id="timerInput" min="1" max="600" placeholder="e.g. 10" />
-    <div class="note">Leave empty for manual stop</div>
-  </div>
+function pad(num){return num.toString().padStart(2,'0');}
 
-  <script>
-    let wakeLock = null;
-    const button = document.getElementById("toggleButton");
-    const statusText = document.getElementById("status");
-    const themeToggle = document.getElementById("themeToggle");
-    const body = document.body;
-    const timerInput = document.getElementById("timerInput");
+function flip(digitElem, newNum){
+  const top = digitElem.querySelector(".top");
+  const bottom = digitElem.querySelector(".bottom");
 
-    let startTime = null;
-    let elapsedInterval = null;
-    let autoStopTimeout = null;
+  if(top.textContent==newNum) return;
 
-    // Flip digit elements
-    const digits = {
-      hT: document.getElementById("hourTens"),
-      hO: document.getElementById("hourOnes"),
-      mT: document.getElementById("minTens"),
-      mO: document.getElementById("minOnes"),
-      sT: document.getElementById("secTens"),
-      sO: document.getElementById("secOnes")
-    };
+  const flipTop = document.createElement("div");
+  flipTop.className = "flip-top";
+  flipTop.textContent = top.textContent;
 
-    function updateFlip(digitElem, newNum) {
-      const top = digitElem.querySelector(".digit-top");
-      const bottom = digitElem.querySelector(".digit-bottom");
-      const flip = digitElem.querySelector(".digit-flip");
+  const flipBottom = document.createElement("div");
+  flipBottom.className = "flip-bottom";
+  flipBottom.textContent = newNum;
 
-      if (top.textContent === String(newNum)) return;
+  digitElem.appendChild(flipTop);
+  digitElem.appendChild(flipBottom);
 
-      flip.textContent = newNum;
-      flip.style.transform = "rotateX(0deg)";
-      flip.style.transition = "none";
-      requestAnimationFrame(() => {
-        flip.style.transition = "transform 0.3s ease-in";
-        flip.style.transform = "rotateX(-180deg)";
-      });
+  flipTop.style.transform="rotateX(0deg)";
+  flipTop.style.transition="transform 0.3s ease-in";
+  requestAnimationFrame(()=>flipTop.style.transform="rotateX(-180deg)");
 
-      setTimeout(() => {
-        top.textContent = newNum;
-        bottom.textContent = newNum;
-        flip.style.transition = "none";
-        flip.style.transform = "rotateX(0deg)";
-      }, 300);
-    }
+  flipBottom.style.transform="rotateX(180deg)";
+  flipBottom.style.transition="transform 0.3s ease-out";
+  requestAnimationFrame(()=>flipBottom.style.transform="rotateX(0deg)");
 
-    function startClock() {
-      startTime = Date.now();
-      elapsedInterval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const hours = Math.floor(elapsed / 3600000);
-        const mins = Math.floor((elapsed % 3600000) / 60000);
-        const secs = Math.floor((elapsed % 60000) / 1000);
+  setTimeout(()=>{
+    top.textContent=newNum;
+    bottom.textContent=newNum;
+    flipTop.remove();
+    flipBottom.remove();
+  },300);
+}
 
-        updateFlip(digits.hT, Math.floor(hours / 10));
-        updateFlip(digits.hO, hours % 10);
-        updateFlip(digits.mT, Math.floor(mins / 10));
-        updateFlip(digits.mO, mins % 10);
-        updateFlip(digits.sT, Math.floor(secs / 10));
-        updateFlip(digits.sO, secs % 10);
-      }, 1000);
-    }
+function updateClock(){
+  const elapsed = Math.floor((Date.now()-startTime)/1000);
+  const h = Math.floor(elapsed/3600);
+  const m = Math.floor((elapsed%3600)/60);
+  const s = elapsed%60;
+  const [h1,h2] = pad(h).split('');
+  const [m1,m2] = pad(m).split('');
+  const [s1,s2] = pad(s).split('');
+  flip(digits.hT,h1);
+  flip(digits.hO,h2);
+  flip(digits.mT,m1);
+  flip(digits.mO,m2);
+  flip(digits.sT,s1);
+  flip(digits.sO,s2);
+}
 
-    function stopClock() {
-      clearInterval(elapsedInterval);
-      for (let key in digits) updateFlip(digits[key], 0);
-    }
-
-    // Wake Lock control
-    async function requestWakeLock() {
-      try {
-        wakeLock = await navigator.wakeLock.request("screen");
-        startClock();
-        statusText.textContent = "Status: Awake (active)";
-        button.textContent = "Stop Keeping Awake";
-
-        const minutes = parseInt(timerInput.value);
-        if (!isNaN(minutes) && minutes > 0) {
-          autoStopTimeout = setTimeout(stopWakeLock, minutes * 60 * 1000);
-        }
-
-        wakeLock.addEventListener("release", () => {
-          stopClock();
-          statusText.textContent = "Status: Inactive";
-          button.textContent = "Keep Awake";
-        });
-      } catch (err) {
-        statusText.textContent = "Wake Lock not supported or blocked by browser.";
-        console.error(err);
-      }
-    }
-
-    function stopWakeLock() {
-      if (wakeLock) {
-        wakeLock.release();
-        wakeLock = null;
-      }
-      stopClock();
-      clearTimeout(autoStopTimeout);
-    }
-
-    button.addEventListener("click", async () => {
-      if (wakeLock) {
-        stopWakeLock();
-      } else {
-        await requestWakeLock();
-      }
-    });
-
-    // Theme toggle
-    themeToggle.addEventListener("click", () => {
-      themeToggle.classList.add("rotate");
-      setTimeout(() => themeToggle.classList.remove("rotate"), 500);
-
-      if (body.classList.contains("dark")) {
-        body.classList.replace("dark", "light");
-        themeToggle.textContent = "☀️";
-      } else {
-        body.classList.replace("light", "dark");
-        themeToggle.textContent = "🌙";
-      }
-    });
-  </script>
+document.getElementById("toggle").addEventListener("click",()=>{
+  if(running){
+    clearInterval(interval);
+    running=false;
+  } else {
+    startTime=Date.now();
+    interval=setInterval(updateClock,1000);
+    running=true;
+  }
+});
+</script>
 </body>
 </html>
